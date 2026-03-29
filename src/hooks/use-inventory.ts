@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { type Car } from "../lib/data";
 
-const ADMIN_TOKEN = "autoassets2024";
+const ADMIN_TOKEN = "autoassets2240";
 
 function adminHeaders() {
   return {

@@ -8,7 +8,7 @@ import {
   LogOut, ArrowLeft, X, Image, Upload, ChevronUp, ChevronDown,
 } from "lucide-react";
 
-const ADMIN_PASSWORD = "autoassets2024";
+const ADMIN_PASSWORD = "autoassets2240";
 const SESSION_KEY = "aa_admin_session";
 
 const CROP_W = 360;
