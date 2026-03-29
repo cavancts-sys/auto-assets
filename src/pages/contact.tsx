@@ -30,7 +30,7 @@ export default function Contact() {
       <section className="relative pt-40 pb-20 px-4 flex items-center justify-center overflow-hidden border-b border-border">
         <div className="absolute inset-0 z-0">
           <img 
-            src={`${import.meta.env.BASE_URL}images/contact-bg.png`}
+            src={`${import.meta.env.BASE_URL}images/contact-bg.jpg`}
             alt="Contact Background" 
             className="w-full h-full object-cover"
           />
