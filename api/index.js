@@ -5,10 +5,8 @@ import pg from "pg";
 
 const { Pool } = pg;
 
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "autoassets2024";
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "autoassets2240";
 
-// Pool is created lazily so missing DATABASE_URL gives a clean error response
-// rather than crashing the entire serverless function at cold-start.
 let pool = null;
 
 function getPool() {
@@ -52,9 +50,12 @@ async function initDb() {
       transmission    TEXT NOT NULL DEFAULT '',
       fuel_type       TEXT NOT NULL DEFAULT '',
       auto_trader_url TEXT,
+      description     TEXT,
       sort_order      INTEGER NOT NULL DEFAULT 0
     )
   `);
+  // Migrate existing tables that were created before description was added
+  await p.query(`ALTER TABLE cars ADD COLUMN IF NOT EXISTS description TEXT`);
   const { rows } = await p.query("SELECT COUNT(*) FROM cars");
   if (parseInt(rows[0].count) === 0) await seedCars(p);
   dbReady = true;
@@ -78,9 +79,9 @@ async function seedCars(p) {
   for (let i = 0; i < cars.length; i++) {
     const c = cars[i];
     await p.query(
-      `INSERT INTO cars (year,make,model,price,was_price,mileage,service_history,colour,status,images,body_type,engine,transmission,fuel_type,auto_trader_url,sort_order)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
-      [c.year,c.make,c.model,c.price,c.wasPrice,c.mileage,c.serviceHistory,c.colour,c.status,c.images,c.bodyType,c.engine,c.transmission,c.fuelType,null,i]
+      `INSERT INTO cars (year,make,model,price,was_price,mileage,service_history,colour,status,images,body_type,engine,transmission,fuel_type,auto_trader_url,description,sort_order)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
+      [c.year,c.make,c.model,c.price,c.wasPrice,c.mileage,c.serviceHistory,c.colour,c.status,c.images,c.bodyType,c.engine,c.transmission,c.fuelType,null,null,i]
     );
   }
 }
@@ -94,6 +95,7 @@ function rowToApi(r) {
     bodyType: r.body_type, engine: r.engine,
     transmission: r.transmission, fuelType: r.fuel_type,
     autoTraderUrl: r.auto_trader_url ?? undefined,
+    description: r.description ?? undefined,
   };
 }
 
@@ -107,7 +109,6 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-// Init DB before every request — safe to call repeatedly (no-op after first success)
 app.use(async (_req, res, next) => {
   try {
     await initDb();
@@ -136,9 +137,9 @@ app.post("/api/cars", requireAdmin, async (req, res) => {
     const { rows: [m] } = await p.query("SELECT MIN(sort_order) AS min FROM cars");
     const sortOrder = (m.min ?? 0) - 1;
     const { rows: [inserted] } = await p.query(
-      `INSERT INTO cars (year,make,model,price,was_price,mileage,service_history,colour,status,images,body_type,engine,transmission,fuel_type,auto_trader_url,sort_order)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING *`,
-      [b.year,b.make,b.model,b.price??null,b.wasPrice??null,b.mileage,b.serviceHistory,b.colour,b.status,b.images??[],b.bodyType,b.engine,b.transmission,b.fuelType,b.autoTraderUrl??null,sortOrder]
+      `INSERT INTO cars (year,make,model,price,was_price,mileage,service_history,colour,status,images,body_type,engine,transmission,fuel_type,auto_trader_url,description,sort_order)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING *`,
+      [b.year,b.make,b.model,b.price??null,b.wasPrice??null,b.mileage,b.serviceHistory,b.colour,b.status,b.images??[],b.bodyType,b.engine,b.transmission,b.fuelType,b.autoTraderUrl??null,b.description??null,sortOrder]
     );
     res.status(201).json(rowToApi(inserted));
   } catch (err) {
@@ -152,8 +153,8 @@ app.put("/api/cars/:id", requireAdmin, async (req, res) => {
     const id = parseInt(req.params.id);
     const b = req.body;
     const { rows: [updated] } = await p.query(
-      `UPDATE cars SET year=$1,make=$2,model=$3,price=$4,was_price=$5,mileage=$6,service_history=$7,colour=$8,status=$9,images=$10,body_type=$11,engine=$12,transmission=$13,fuel_type=$14,auto_trader_url=$15 WHERE id=$16 RETURNING *`,
-      [b.year,b.make,b.model,b.price??null,b.wasPrice??null,b.mileage,b.serviceHistory,b.colour,b.status,b.images??[],b.bodyType,b.engine,b.transmission,b.fuelType,b.autoTraderUrl??null,id]
+      `UPDATE cars SET year=$1,make=$2,model=$3,price=$4,was_price=$5,mileage=$6,service_history=$7,colour=$8,status=$9,images=$10,body_type=$11,engine=$12,transmission=$13,fuel_type=$14,auto_trader_url=$15,description=$16 WHERE id=$17 RETURNING *`,
+      [b.year,b.make,b.model,b.price??null,b.wasPrice??null,b.mileage,b.serviceHistory,b.colour,b.status,b.images??[],b.bodyType,b.engine,b.transmission,b.fuelType,b.autoTraderUrl??null,b.description??null,id]
     );
     if (!updated) { res.status(404).json({ error: "Car not found" }); return; }
     res.json(rowToApi(updated));
