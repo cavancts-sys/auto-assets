@@ -415,10 +415,17 @@ function CarForm({
               <div>
                 <label className={labelCls}>Colour *</label>
                 {(() => {
-                  const parts = form.colour.split("/").map(s => s.trim());
-                  const hex1 = parts[0] || "#808080";
-                  const hex2 = parts[1] || "";
-                  const isSplit = parts.length >= 2;
+                  const pipeIdx = form.colour.indexOf("|");
+                  const hexPart = pipeIdx !== -1 ? form.colour.slice(0, pipeIdx).trim() : form.colour.trim();
+                  const namePart = pipeIdx !== -1 ? form.colour.slice(pipeIdx + 1).trim() : "";
+                  const hexSlash = hexPart.split("/").map(s => s.trim());
+                  const hex1 = hexSlash[0] || "#808080";
+                  const hex2 = hexSlash[1] || "";
+                  const isSplit = hexSlash.length >= 2;
+
+                  const updateHex = (newHex: string) =>
+                    set("colour", namePart ? `${newHex}|${namePart}` : newHex);
+
                   return (
                     <div className="space-y-3">
                       {/* Live swatch */}
@@ -426,6 +433,7 @@ function CarForm({
                         className="w-full h-10 rounded-lg overflow-hidden border border-white/10"
                         style={{ background: resolveColour(form.colour) }}
                       />
+
                       {/* Pickers row */}
                       <div className="flex items-center gap-2">
                         {/* Picker 1 */}
@@ -436,23 +444,24 @@ function CarForm({
                             value={hex1.startsWith("#") ? hex1 : "#808080"}
                             onChange={e => {
                               const v = e.target.value;
-                              set("colour", isSplit ? `${v}/${hex2}` : v);
+                              updateHex(isSplit ? `${v}/${hex2}` : v);
                             }}
                           />
                           <div className="flex items-center gap-2 px-3 py-2.5 bg-white/5 hover:bg-white/10 border border-white/15 hover:border-white/30 rounded-lg transition-all">
                             <Pipette size={14} className="text-white/60 shrink-0" />
                             <div
                               className="w-5 h-5 rounded-full overflow-hidden shrink-0"
-                              style={{ background: hex1.startsWith("#") ? hex1 : resolveColour(hex1), boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.15)" }}
+                              style={{ background: hex1.startsWith("#") ? hex1 : "#808080", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.15)" }}
                             />
                             <span className="text-white/60 text-xs font-mono">{hex1.startsWith("#") ? hex1 : "Pick colour"}</span>
                           </div>
                         </label>
+
                         {/* Split toggle / Picker 2 */}
                         {!isSplit ? (
                           <button
                             type="button"
-                            onClick={() => set("colour", `${hex1.startsWith("#") ? hex1 : "#808080"}/#ffffff`)}
+                            onClick={() => updateHex(`${hex1.startsWith("#") ? hex1 : "#808080"}/#ffffff`)}
                             className="px-3 py-2.5 bg-white/5 hover:bg-white/10 border border-white/15 hover:border-white/30 rounded-lg text-xs text-white/50 hover:text-white/80 transition-all whitespace-nowrap"
                           >
                             + Split
@@ -464,20 +473,20 @@ function CarForm({
                                 type="color"
                                 className="sr-only"
                                 value={hex2.startsWith("#") ? hex2 : "#ffffff"}
-                                onChange={e => set("colour", `${hex1}/${e.target.value}`)}
+                                onChange={e => updateHex(`${hex1}/${e.target.value}`)}
                               />
                               <div className="flex items-center gap-2 px-3 py-2.5 bg-white/5 hover:bg-white/10 border border-white/15 hover:border-white/30 rounded-lg transition-all">
                                 <Pipette size={14} className="text-white/60 shrink-0" />
                                 <div
                                   className="w-5 h-5 rounded-full overflow-hidden shrink-0"
-                                  style={{ background: hex2.startsWith("#") ? hex2 : resolveColour(hex2), boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.15)" }}
+                                  style={{ background: hex2.startsWith("#") ? hex2 : "#ffffff", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.15)" }}
                                 />
                                 <span className="text-white/60 text-xs font-mono">{hex2.startsWith("#") ? hex2 : "Pick 2nd"}</span>
                               </div>
                             </label>
                             <button
                               type="button"
-                              onClick={() => set("colour", hex1)}
+                              onClick={() => updateHex(hex1)}
                               className="p-2.5 text-white/30 hover:text-white/70 hover:bg-white/5 rounded-lg transition-all"
                               title="Remove split"
                             >
@@ -486,6 +495,17 @@ function CarForm({
                           </>
                         )}
                       </div>
+
+                      {/* Display name */}
+                      <input
+                        className={inputCls}
+                        value={namePart}
+                        onChange={e => {
+                          const n = e.target.value;
+                          set("colour", n ? `${hexPart}|${n}` : hexPart);
+                        }}
+                        placeholder="Colour name shown on listing (e.g. Cherry Red, Black/White)"
+                      />
                     </div>
                   );
                 })()}

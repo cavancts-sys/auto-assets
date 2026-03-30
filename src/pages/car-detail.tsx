@@ -3,7 +3,7 @@ import { useParams, Link } from "wouter";
 import { Layout } from "../components/layout";
 import { useCar, useCars } from "../hooks/use-cars";
 import { formatPrice } from "../lib/data";
-import { resolveColour } from "../lib/colour-utils";
+import { resolveColour, parseColour } from "../lib/colour-utils";
 import { MarqueeText } from "../components/marquee-text";
 import {
   ArrowLeft, CheckCircle2, Gauge, Calendar, Settings2,
@@ -166,7 +166,7 @@ export default function CarDetail() {
     { label: "Engine",       value: car.engine,            icon: <Settings2 size={20} /> },
     { label: "Fuel Type",    value: car.fuelType,          icon: <Droplet size={20} /> },
     { label: "Body Type",    value: car.bodyType,          icon: <CarIcon size={20} /> },
-    { label: "Colour",       value: car.colour.startsWith("#") ? "Custom" : car.colour, icon: (
+    { label: "Colour",       value: (() => { const { swatch, name } = parseColour(car.colour); return name || (swatch.startsWith("#") ? "Custom" : swatch); })(), icon: (
       <div className="w-5 h-5 rounded-full overflow-hidden shrink-0" style={{ background: resolveColour(car.colour), boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.15)" }} />
     )},
     { label: "History",      value: car.serviceHistory,   icon: <ShieldCheck size={20} /> },
