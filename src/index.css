@@ -1,6 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800;900&display=swap');
 @import "tailwindcss";
 
+@keyframes slideInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
 @keyframes marquee-bounce {
   0%,  12% { transform: translateX(0); }
   88%, 100% { transform: translateX(var(--marquee-shift, -60px)); }

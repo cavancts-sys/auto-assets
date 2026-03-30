@@ -6,6 +6,7 @@ import { type Car, formatPrice } from "../lib/data";
 import {
   Plus, Pencil, Trash2, ToggleLeft, ToggleRight,
   LogOut, ArrowLeft, X, Image, Upload, ChevronUp, ChevronDown, Pipette,
+  CheckCircle2, AlertCircle,
 } from "lucide-react";
 
 const ADMIN_PASSWORD = "autoassets2240";
@@ -647,6 +648,8 @@ function CarForm({
   );
 }
 
+type Notification = { message: string; type: "success" | "error" };
+
 function AdminPanel() {
   const { cars, addCar, updateCar, deleteCar, toggleStatus, moveUp, moveDown } = useInventory();
   const [formMode, setFormMode] = useState<"none" | "add" | "edit">("none");
@@ -654,6 +657,14 @@ function AdminPanel() {
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [filter, setFilter] = useState<"all" | "available" | "sold">("all");
   const [saving, setSaving] = useState(false);
+  const [notification, setNotification] = useState<Notification | null>(null);
+  const notifTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function showNotification(n: Notification) {
+    if (notifTimer.current) clearTimeout(notifTimer.current);
+    setNotification(n);
+    notifTimer.current = setTimeout(() => setNotification(null), 4000);
+  }
 
   function logout() {
     sessionStorage.removeItem(SESSION_KEY);
@@ -664,13 +675,20 @@ function AdminPanel() {
     const carData = formToCar(data);
     setSaving(true);
     try {
-      if (formMode === "add") await addCar(carData);
-      else if (formMode === "edit" && editingCar) await updateCar(editingCar.id, carData);
+      if (formMode === "add") {
+        await addCar(carData);
+        showNotification({ message: "New car added successfully.", type: "success" });
+      } else if (formMode === "edit" && editingCar) {
+        await updateCar(editingCar.id, carData);
+        showNotification({ message: "Changes saved successfully.", type: "success" });
+      }
+      setFormMode("none");
+      setEditingCar(null);
+    } catch {
+      showNotification({ message: "Save failed — please try again.", type: "error" });
     } finally {
       setSaving(false);
     }
-    setFormMode("none");
-    setEditingCar(null);
   }
 
   async function handleDelete(id: number) {
@@ -682,6 +700,29 @@ function AdminPanel() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Notification toast */}
+      {notification && (
+        <div
+          className={`fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl border transition-all duration-300 ${
+            notification.type === "success"
+              ? "bg-emerald-950 border-emerald-700 text-emerald-200"
+              : "bg-red-950 border-red-700 text-red-200"
+          }`}
+          style={{ animation: "slideInUp 0.25s ease" }}
+        >
+          {notification.type === "success"
+            ? <CheckCircle2 size={20} className="text-emerald-400 shrink-0" />
+            : <AlertCircle size={20} className="text-red-400 shrink-0" />}
+          <span className="font-semibold text-sm">{notification.message}</span>
+          <button
+            onClick={() => setNotification(null)}
+            className="ml-2 text-current opacity-50 hover:opacity-100 transition-opacity"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/10 px-4 sm:px-6 lg:px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
