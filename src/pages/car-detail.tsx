@@ -166,7 +166,7 @@ export default function CarDetail() {
     { label: "Engine",       value: car.engine,            icon: <Settings2 size={20} /> },
     { label: "Fuel Type",    value: car.fuelType,          icon: <Droplet size={20} /> },
     { label: "Body Type",    value: car.bodyType,          icon: <CarIcon size={20} /> },
-    { label: "Colour",       value: car.colour,            icon: (
+    { label: "Colour",       value: car.colour.startsWith("#") ? "Custom" : car.colour, icon: (
       <div className="w-5 h-5 rounded-full overflow-hidden shrink-0" style={{ background: resolveColour(car.colour), boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.15)" }} />
     )},
     { label: "History",      value: car.serviceHistory,   icon: <ShieldCheck size={20} /> },
@@ -320,20 +320,6 @@ export default function CarDetail() {
                   )}
                 </div>
 
-                {/* Description banner */}
-                {car.description && (
-                  <button
-                    type="button"
-                    onClick={() => setDescOpen(true)}
-                    className="mt-4 w-full flex items-center justify-between px-5 py-3.5 bg-white/5 border border-white/10 hover:border-white/25 rounded-xl transition-all group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <FileText size={16} className="text-primary" />
-                      <span className="text-sm text-white/70 group-hover:text-white transition-colors">Description</span>
-                    </div>
-                    <ArrowLeft size={14} className="text-white/30 rotate-180 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                )}
               </motion.div>
             </div>
           </div>

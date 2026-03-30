@@ -5,7 +5,7 @@ import { useInventory } from "../hooks/use-inventory";
 import { type Car, formatPrice } from "../lib/data";
 import {
   Plus, Pencil, Trash2, ToggleLeft, ToggleRight,
-  LogOut, ArrowLeft, X, Image, Upload, ChevronUp, ChevronDown,
+  LogOut, ArrowLeft, X, Image, Upload, ChevronUp, ChevronDown, Pipette,
 } from "lucide-react";
 
 const ADMIN_PASSWORD = "autoassets2240";
@@ -414,24 +414,81 @@ function CarForm({
               </div>
               <div>
                 <label className={labelCls}>Colour *</label>
-                <div className="relative">
-                  <div
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full overflow-hidden transition-all duration-300 pointer-events-none"
-                    style={{ background: resolveColour(form.colour), boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.2)" }}
-                  />
-                  <input
-                    className={inputCls + " pl-10"}
-                    value={form.colour}
-                    onChange={e => set("colour", e.target.value)}
-                    placeholder="e.g. Coffee Brown, Black/White"
-                  />
-                </div>
-                {form.colour.trim() && (
-                  <p className="text-white/30 text-xs mt-1.5 flex items-center gap-1.5">
-                    <span className="inline-block w-2 h-2 rounded-full" style={{ background: resolveColour(form.colour) }} />
-                    Auto-matched · type anything, even slashes for splits
-                  </p>
-                )}
+                {(() => {
+                  const parts = form.colour.split("/").map(s => s.trim());
+                  const hex1 = parts[0] || "#808080";
+                  const hex2 = parts[1] || "";
+                  const isSplit = parts.length >= 2;
+                  return (
+                    <div className="space-y-3">
+                      {/* Live swatch */}
+                      <div
+                        className="w-full h-10 rounded-lg overflow-hidden border border-white/10"
+                        style={{ background: resolveColour(form.colour) }}
+                      />
+                      {/* Pickers row */}
+                      <div className="flex items-center gap-2">
+                        {/* Picker 1 */}
+                        <label className="relative cursor-pointer flex-1">
+                          <input
+                            type="color"
+                            className="sr-only"
+                            value={hex1.startsWith("#") ? hex1 : "#808080"}
+                            onChange={e => {
+                              const v = e.target.value;
+                              set("colour", isSplit ? `${v}/${hex2}` : v);
+                            }}
+                          />
+                          <div className="flex items-center gap-2 px-3 py-2.5 bg-white/5 hover:bg-white/10 border border-white/15 hover:border-white/30 rounded-lg transition-all">
+                            <Pipette size={14} className="text-white/60 shrink-0" />
+                            <div
+                              className="w-5 h-5 rounded-full overflow-hidden shrink-0"
+                              style={{ background: hex1.startsWith("#") ? hex1 : resolveColour(hex1), boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.15)" }}
+                            />
+                            <span className="text-white/60 text-xs font-mono">{hex1.startsWith("#") ? hex1 : "Pick colour"}</span>
+                          </div>
+                        </label>
+                        {/* Split toggle / Picker 2 */}
+                        {!isSplit ? (
+                          <button
+                            type="button"
+                            onClick={() => set("colour", `${hex1.startsWith("#") ? hex1 : "#808080"}/#ffffff`)}
+                            className="px-3 py-2.5 bg-white/5 hover:bg-white/10 border border-white/15 hover:border-white/30 rounded-lg text-xs text-white/50 hover:text-white/80 transition-all whitespace-nowrap"
+                          >
+                            + Split
+                          </button>
+                        ) : (
+                          <>
+                            <label className="relative cursor-pointer flex-1">
+                              <input
+                                type="color"
+                                className="sr-only"
+                                value={hex2.startsWith("#") ? hex2 : "#ffffff"}
+                                onChange={e => set("colour", `${hex1}/${e.target.value}`)}
+                              />
+                              <div className="flex items-center gap-2 px-3 py-2.5 bg-white/5 hover:bg-white/10 border border-white/15 hover:border-white/30 rounded-lg transition-all">
+                                <Pipette size={14} className="text-white/60 shrink-0" />
+                                <div
+                                  className="w-5 h-5 rounded-full overflow-hidden shrink-0"
+                                  style={{ background: hex2.startsWith("#") ? hex2 : resolveColour(hex2), boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.15)" }}
+                                />
+                                <span className="text-white/60 text-xs font-mono">{hex2.startsWith("#") ? hex2 : "Pick 2nd"}</span>
+                              </div>
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => set("colour", hex1)}
+                              className="p-2.5 text-white/30 hover:text-white/70 hover:bg-white/5 rounded-lg transition-all"
+                              title="Remove split"
+                            >
+                              <X size={14} />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
                 {errors.colour && <p className={errCls}>{errors.colour}</p>}
               </div>
               <div>
