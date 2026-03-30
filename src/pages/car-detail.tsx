@@ -117,7 +117,7 @@ export default function CarDetail() {
     { label: "Engine",       value: car.engine,                icon: <Settings2 size={20} /> },
     { label: "Fuel Type",    value: car.fuelType,              icon: <Droplet size={20} /> },
     { label: "Body Type",    value: car.bodyType,              icon: <CarIcon size={20} /> },
-    { label: "Colour",       value: car.colour,                icon: <div className="w-5 h-5 rounded-full border border-white/20" style={{ backgroundColor: resolveColour(car.colour) }} /> },
+    { label: "Colour",       value: car.colour,                icon: <div className="w-5 h-5 rounded-full border border-white/20" style={{ background: resolveColour(car.colour) }} /> },
     { label: "History",      value: car.serviceHistory,        icon: <ShieldCheck size={20} /> },
   ];
 

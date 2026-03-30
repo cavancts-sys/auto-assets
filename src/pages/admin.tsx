@@ -84,6 +84,7 @@ function ImageCropper({
   const [imgSrc, setImgSrc] = useState("");
   const [naturalSize, setNaturalSize] = useState({ w: 0, h: 0 });
   const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
 
@@ -93,9 +94,10 @@ function ImageCropper({
     reader.readAsDataURL(file);
   }, [file]);
 
-  const scale = naturalSize.w > 0
+  const baseScale = naturalSize.w > 0
     ? Math.max(CROP_W / naturalSize.w, CROP_H / naturalSize.h)
     : 1;
+  const scale = baseScale * zoom;
   const scaledW = naturalSize.w * scale;
   const scaledH = naturalSize.h * scale;
 
@@ -116,6 +118,11 @@ function ImageCropper({
     });
   }
 
+  function handleZoomChange(newZoom: number) {
+    setZoom(newZoom);
+    setPan(prev => clamp(prev.x, prev.y));
+  }
+
   function startDrag(clientX: number, clientY: number) {
     isDragging.current = true;
     dragStart.current = { x: clientX, y: clientY, panX: pan.x, panY: pan.y };
@@ -128,8 +135,8 @@ function ImageCropper({
   }
   function endDrag() { isDragging.current = false; }
 
-  async function confirm() {
-    if (!imgSrc) return;
+  function confirm() {
+    if (!imgSrc || naturalSize.w === 0) return;
     const targetH = Math.round(maxWidth * (CROP_H / CROP_W));
     const canvas = document.createElement("canvas");
     canvas.width = maxWidth;
@@ -138,7 +145,7 @@ function ImageCropper({
     if (!ctx) return;
     const img = new window.Image();
     img.onload = () => {
-      const s = Math.max(CROP_W / img.naturalWidth, CROP_H / img.naturalHeight);
+      const s = Math.max(CROP_W / img.naturalWidth, CROP_H / img.naturalHeight) * zoom;
       const srcX = -pan.x / s;
       const srcY = -pan.y / s;
       const srcW = CROP_W / s;
@@ -155,9 +162,9 @@ function ImageCropper({
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-white font-bold text-lg">Crop Photo</h3>
-            <p className="text-white/40 text-xs mt-0.5">Drag to reposition the image</p>
+            <p className="text-white/40 text-xs mt-0.5">Drag to reposition · use zoom to fit</p>
           </div>
-          <button onClick={onCancel} className="p-2 text-white/40 hover:text-white transition-colors">
+          <button type="button" onClick={onCancel} className="p-2 text-white/40 hover:text-white transition-colors rounded-lg hover:bg-white/5">
             <X size={20} />
           </button>
         </div>
@@ -165,13 +172,13 @@ function ImageCropper({
         {/* Crop Box */}
         <div
           style={{ width: CROP_W, height: CROP_H }}
-          className="relative overflow-hidden rounded-xl border-2 border-white/30 cursor-grab active:cursor-grabbing mx-auto bg-black select-none touch-none"
+          className="relative overflow-hidden rounded-xl border-2 border-white/20 cursor-grab active:cursor-grabbing mx-auto bg-zinc-950 select-none touch-none"
           onMouseDown={e => startDrag(e.clientX, e.clientY)}
           onMouseMove={e => moveDrag(e.clientX, e.clientY)}
           onMouseUp={endDrag}
           onMouseLeave={endDrag}
           onTouchStart={e => { const t = e.touches[0]; startDrag(t.clientX, t.clientY); }}
-          onTouchMove={e => { const t = e.touches[0]; moveDrag(t.clientX, t.clientY); }}
+          onTouchMove={e => { e.preventDefault(); const t = e.touches[0]; moveDrag(t.clientX, t.clientY); }}
           onTouchEnd={endDrag}
         >
           {imgSrc && (
@@ -196,25 +203,45 @@ function ImageCropper({
               Loading…
             </div>
           )}
-          {/* Rule of thirds grid */}
+          {/* Rule of thirds overlay */}
           <div className="absolute inset-0 pointer-events-none" style={{
-            backgroundImage: "linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)",
-            backgroundSize: "120px 90px",
+            backgroundImage: "linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px)",
+            backgroundSize: `${CROP_W / 3}px ${CROP_H / 3}px`,
           }} />
+          {/* Corner markers */}
+          {[["top-0 left-0","border-t-2 border-l-2"],["top-0 right-0","border-t-2 border-r-2"],["bottom-0 left-0","border-b-2 border-l-2"],["bottom-0 right-0","border-b-2 border-r-2"]].map(([pos,border]) => (
+            <div key={pos} className={`absolute ${pos} w-5 h-5 ${border} border-white/60 pointer-events-none`} />
+          ))}
         </div>
 
-        <p className="text-center text-white/30 text-xs mt-3 mb-5">
+        {/* Zoom slider */}
+        <div className="mt-4 px-1">
+          <div className="flex items-center justify-between text-xs text-white/40 mb-1.5">
+            <span>Zoom</span>
+            <span>{Math.round(zoom * 100)}%</span>
+          </div>
+          <input
+            type="range" min={1} max={3} step={0.05} value={zoom}
+            onChange={e => handleZoomChange(Number(e.target.value))}
+            className="w-full accent-white"
+          />
+          <div className="flex justify-between text-xs text-white/20 mt-0.5"><span>1×</span><span>3×</span></div>
+        </div>
+
+        <p className="text-center text-white/25 text-xs mt-3 mb-5">
           Output: {maxWidth} × {Math.round(maxWidth * CROP_H / CROP_W)}px
         </p>
 
         <div className="flex gap-3">
           <button
+            type="button"
             onClick={onCancel}
             className="flex-1 py-3 border border-white/20 text-white rounded-lg font-semibold hover:bg-white/5 transition-colors text-sm"
           >
             Cancel
           </button>
           <button
+            type="button"
             onClick={confirm}
             disabled={!imgSrc || naturalSize.w === 0}
             className="flex-1 py-3 bg-white text-black rounded-lg font-bold hover:bg-white/90 transition-colors text-sm disabled:opacity-40"
@@ -386,8 +413,8 @@ function CarForm({
                 <label className={labelCls}>Colour *</label>
                 <div className="relative">
                   <div
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border border-white/30 transition-colors duration-200 pointer-events-none"
-                    style={{ backgroundColor: resolveColour(form.colour) }}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border border-white/30 transition-colors duration-200 pointer-events-none overflow-hidden"
+                    style={{ background: resolveColour(form.colour) }}
                   />
                   <input
                     className={inputCls + " pl-10"}

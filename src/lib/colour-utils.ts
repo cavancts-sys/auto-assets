@@ -1,6 +1,7 @@
 /**
- * Maps a free-text car colour string to the closest CSS hex colour.
- * Checks each word/phrase in the input against a priority-ordered keyword list.
+ * Maps a free-text car colour string to a CSS background value (hex or gradient).
+ * Supports split colours like "black/white" → half-and-half gradient.
+ * Supports semantic names like "coffee", "sand", "olive" etc.
  */
 
 type ColourEntry = { keywords: string[]; hex: string };
@@ -19,11 +20,12 @@ const COLOUR_MAP: ColourEntry[] = [
   { keywords: ["space grey", "space gray", "gunmetal", "anthracite", "charcoal", "dark grey", "dark gray", "graphite", "slate", "ash grey", "ash gray", "iron grey", "iron gray"], hex: "#3a3a3a" },
   { keywords: ["nardo grey", "nardo gray", "cement", "concrete grey", "concrete gray", "urban grey", "urban gray", "mineral grey", "mineral gray"], hex: "#808080" },
   { keywords: ["silver", "chrome", "aluminium", "aluminum", "metallic grey", "metallic gray", "light grey", "light gray", "platinum", "titanium", "pewter", "nickel"], hex: "#b0b0b0" },
-  { keywords: ["grey", "gray"], hex: "#888888" },
+  { keywords: ["grey", "gray", "thunder grey", "thunder gray"], hex: "#888888" },
 
   // Reds
   { keywords: ["candy red", "candy apple", "cherry red", "chilli red", "chili red", "ferrari red", "imola red", "rosso corsa", "lava red", "flame red"], hex: "#cc0000" },
   { keywords: ["dark red", "maroon", "burgundy", "wine red", "wine", "crimson", "claret", "oxblood", "sangria"], hex: "#7f0000" },
+  { keywords: ["black cherry", "cherry black"], hex: "#3d0014" },
   { keywords: ["orange red", "torch red", "sunset red", "bright red", "racing red", "sport red", "rally red"], hex: "#e8232a" },
   { keywords: ["red"], hex: "#e02020" },
   { keywords: ["rose", "blush", "coral pink"], hex: "#ff6b8a" },
@@ -56,32 +58,63 @@ const COLOUR_MAP: ColourEntry[] = [
   { keywords: ["violet", "indigo"], hex: "#7c3aed" },
   { keywords: ["purple", "lavender", "mauve"], hex: "#a855f7" },
 
-  // Browns / Bronzes / Coppers
-  { keywords: ["dark brown", "chocolate", "espresso", "walnut", "mahogany"], hex: "#4a2510" },
+  // Browns / Bronzes / Coppers / Earth tones
+  { keywords: ["espresso", "dark brown", "chocolate", "walnut", "mahogany", "ebony brown"], hex: "#3b1a08" },
+  { keywords: ["coffee", "café", "mocha latte"], hex: "#6f4e37" },
+  { keywords: ["mocha", "hazel", "cognac", "caramel latte"], hex: "#7b4f2e" },
   { keywords: ["bronze", "copper", "rose gold"], hex: "#cd7f32" },
-  { keywords: ["brown", "tan", "caramel", "cognac", "mocha", "hazel"], hex: "#92400e" },
-  { keywords: ["beige", "sand", "dune", "sahara", "desert", "khaki", "biscuit"], hex: "#d4b896" },
+  { keywords: ["brown", "tan", "caramel", "cognac", "hazel"], hex: "#92400e" },
+  { keywords: ["beige", "sand", "dune", "sahara", "desert", "khaki", "biscuit", "linen"], hex: "#d4b896" },
+  { keywords: ["clay", "terracotta brown", "adobe"], hex: "#b5651d" },
+  { keywords: ["tobacco", "umber", "russet"], hex: "#8b4513" },
 
   // Champagne / Golds
-  { keywords: ["champagne", "gold", "champagne gold"], hex: "#d4af7a" },
+  { keywords: ["champagne gold", "rose champagne"], hex: "#d4af7a" },
+  { keywords: ["champagne"], hex: "#f7e7ce" },
+  { keywords: ["gold", "golden"], hex: "#d4a017" },
 
   // Wrapped / Special finishes
-  { keywords: ["matte", "satin", "wrapped"], hex: "#666666" },
+  { keywords: ["matte", "satin"], hex: "#666666" },
+  { keywords: ["wrapped", "wrap"], hex: "#555555" },
   { keywords: ["two tone", "two-tone", "bicolor", "bi-colour", "bi-color"], hex: "#888888" },
 ];
 
-export function resolveColour(input: string): string {
-  if (!input || !input.trim()) return "#888888";
-
+function hexForSingle(input: string): string {
   const lower = input.toLowerCase().trim();
-
-  // Try longest-match first by checking full phrases before individual words
+  if (!lower) return "#888888";
   for (const entry of COLOUR_MAP) {
     for (const kw of entry.keywords) {
       if (lower.includes(kw)) return entry.hex;
     }
   }
-
-  // Fallback: medium grey
   return "#888888";
+}
+
+/**
+ * Returns a CSS background value — either a hex string or a linear-gradient.
+ * Supports slash-separated split colours: "black/white" → half-and-half gradient.
+ */
+export function resolveColour(input: string): string {
+  if (!input || !input.trim()) return "#888888";
+
+  const parts = input.split("/").map(p => p.trim()).filter(Boolean);
+
+  if (parts.length >= 2) {
+    const colours = parts.slice(0, 3).map(hexForSingle);
+    if (colours.length === 2) {
+      return `linear-gradient(135deg, ${colours[0]} 50%, ${colours[1]} 50%)`;
+    }
+    const step = 100 / colours.length;
+    const stops = colours.map((c, i) => `${c} ${i * step}%, ${c} ${(i + 1) * step}%`).join(", ");
+    return `linear-gradient(135deg, ${stops})`;
+  }
+
+  return hexForSingle(input);
+}
+
+/**
+ * Returns true if the resolved colour is a gradient (for style property selection).
+ */
+export function isGradientColour(input: string): boolean {
+  return input.includes("/");
 }
