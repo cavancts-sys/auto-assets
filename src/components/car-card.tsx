@@ -71,7 +71,7 @@ export function CarCard({ car, index = 0, isNew = false }: { car: Car; index?: n
                 <span>{car.transmission}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
-                <div className="w-4 h-4 rounded-full border border-white/20 shrink-0" style={{ background: resolveColour(car.colour) }} />
+                <div className="w-4 h-4 rounded-full overflow-hidden shrink-0" style={{ background: resolveColour(car.colour), boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.15)" }} />
                 <MarqueeText className="flex-1 min-w-0 text-sm text-muted-foreground">{car.colour}</MarqueeText>
               </div>
             </div>

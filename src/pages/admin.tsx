@@ -416,8 +416,8 @@ function CarForm({
                 <label className={labelCls}>Colour *</label>
                 <div className="relative">
                   <div
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border border-white/30 transition-all duration-300 pointer-events-none overflow-hidden"
-                    style={{ background: resolveColour(form.colour) }}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full overflow-hidden transition-all duration-300 pointer-events-none"
+                    style={{ background: resolveColour(form.colour), boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.2)" }}
                   />
                   <input
                     className={inputCls + " pl-10"}
