@@ -146,7 +146,11 @@ export function Layout({ children }: { children: ReactNode }) {
               <ul className="space-y-3">
                 {navLinks.map((link) => (
                   <li key={link.path}>
-                    <Link href={link.path} className="text-muted-foreground hover:text-primary transition-colors">
+                    <Link
+                      href={link.path}
+                      onClick={() => link.path === "/" && window.scrollTo({ top: 0, behavior: "smooth" })}
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                    >
                       {link.name}
                     </Link>
                   </li>

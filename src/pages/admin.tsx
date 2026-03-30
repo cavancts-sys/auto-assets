@@ -30,6 +30,7 @@ type FormData = {
   status: "available" | "sold";
   images: string[];
   autoTraderUrl: string;
+  description: string;
 };
 
 const EMPTY_FORM: FormData = {
@@ -37,7 +38,7 @@ const EMPTY_FORM: FormData = {
   year: new Date().getFullYear().toString(),
   price: "", wasPrice: "", mileage: "", serviceHistory: "",
   colour: "", bodyType: "", engine: "", transmission: "", fuelType: "",
-  status: "available", images: [""], autoTraderUrl: "",
+  status: "available", images: [""], autoTraderUrl: "", description: "",
 };
 
 function carToForm(car: Car): FormData {
@@ -52,6 +53,7 @@ function carToForm(car: Car): FormData {
     status: car.status,
     images: car.images.length > 0 ? car.images : [""],
     autoTraderUrl: car.autoTraderUrl || "",
+    description: car.description || "",
   };
 }
 
@@ -70,6 +72,7 @@ function formToCar(form: FormData): Omit<Car, "id"> {
     fuelType: form.fuelType.trim(), status: form.status,
     images: form.images.filter(u => u.trim() !== ""),
     autoTraderUrl: form.autoTraderUrl.trim() || undefined,
+    description: form.description.trim() || undefined,
   };
 }
 
@@ -413,16 +416,22 @@ function CarForm({
                 <label className={labelCls}>Colour *</label>
                 <div className="relative">
                   <div
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border border-white/30 transition-colors duration-200 pointer-events-none overflow-hidden"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border border-white/30 transition-all duration-300 pointer-events-none overflow-hidden"
                     style={{ background: resolveColour(form.colour) }}
                   />
                   <input
                     className={inputCls + " pl-10"}
                     value={form.colour}
                     onChange={e => set("colour", e.target.value)}
-                    placeholder="e.g. Midnight Black"
+                    placeholder="e.g. Coffee Brown, Black/White"
                   />
                 </div>
+                {form.colour.trim() && (
+                  <p className="text-white/30 text-xs mt-1.5 flex items-center gap-1.5">
+                    <span className="inline-block w-2 h-2 rounded-full" style={{ background: resolveColour(form.colour) }} />
+                    Auto-matched · type anything, even slashes for splits
+                  </p>
+                )}
                 {errors.colour && <p className={errCls}>{errors.colour}</p>}
               </div>
               <div>
@@ -484,6 +493,19 @@ function CarForm({
                 <input className={inputCls} value={form.serviceHistory} onChange={e => set("serviceHistory", e.target.value)} placeholder="e.g. Full Service History" />
               </div>
             </div>
+          </div>
+
+          {/* Description */}
+          <div className="bg-white/5 rounded-xl p-6 border border-white/10">
+            <h3 className="text-white font-semibold uppercase tracking-wider text-sm mb-1">Description</h3>
+            <p className="text-white/40 text-xs mb-4">Shown as a popup on the car detail page. Describe the car's highlights, modifications, history, etc.</p>
+            <textarea
+              className={inputCls + " resize-none"}
+              rows={5}
+              value={form.description}
+              onChange={e => set("description", e.target.value)}
+              placeholder="e.g. This stunning 370Z comes in a rare Black Cherry Metallic finish with recent engine rebuild, upgraded brakes, and full detail..."
+            />
           </div>
 
           {/* Images */}

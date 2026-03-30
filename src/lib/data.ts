@@ -15,6 +15,7 @@ export interface Car {
   transmission: string;
   fuelType: string;
   autoTraderUrl?: string;
+  description?: string;
 }
 
 export const CARS: Car[] = [
