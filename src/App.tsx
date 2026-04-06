@@ -10,6 +10,7 @@ import Home from "./pages/home";
 import Garage from "./pages/garage";
 import CarDetail from "./pages/car-detail";
 import Contact from "./pages/contact";
+import About from "./pages/about";
 import Admin from "./pages/admin";
 
 const queryClient = new QueryClient({
@@ -38,6 +39,7 @@ function Router() {
         <Route path="/garage" component={Garage} />
         <Route path="/car/:id" component={CarDetail} />
         <Route path="/contact" component={Contact} />
+        <Route path="/about" component={About} />
         <Route path="/admin" component={Admin} />
         <Route component={NotFound} />
       </Switch>

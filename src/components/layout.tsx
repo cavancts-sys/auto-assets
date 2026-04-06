@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Facebook, MapPin, Mail, Phone } from "lucide-react";
+import { Menu, X, Instagram, MapPin, Mail, Phone } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -25,7 +25,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Garage", path: "/garage" },
-    { name: "Contact Us", path: "/contact" },
+    { name: "About Us", path: "/about" },
   ];
 
   return (
@@ -65,7 +65,7 @@ export function Layout({ children }: { children: ReactNode }) {
               href="/contact"
               className="ml-4 px-6 py-2.5 bg-primary text-black font-bold text-sm tracking-wider uppercase rounded-sm hover:bg-white transition-all duration-300 box-glow-hover"
             >
-              Book Test Drive
+              Contact Us
             </Link>
           </nav>
 
@@ -106,7 +106,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 href="/contact"
                 className="w-full py-4 text-center bg-primary text-black font-bold uppercase tracking-wider rounded-sm"
               >
-                Book Test Drive
+                Contact Us
               </Link>
             </div>
           </motion.div>
@@ -125,17 +125,17 @@ export function Layout({ children }: { children: ReactNode }) {
             <div>
               <img 
                 src={`${import.meta.env.BASE_URL}logo.png`} 
-                alt="Auto Assets" 
-                className="h-12 w-auto mb-6"
+                alt="N2 Auto Sandton" 
+                className="h-16 w-auto mb-6"
               />
               <p className="text-muted-foreground max-w-sm">
-                Elevate your drive with our premium selection of exceptional vehicles in South Africa.
+                Creating a seamless and trustworthy car-buying experience, driven by excellence in service and a passion for quality vehicles.
               </p>
               <div className="flex gap-4 mt-6">
-                <a href="https://www.facebook.com/168652086330059" target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-white hover:bg-primary hover:text-black transition-colors">
-                  <Facebook size={20} />
+                <a href="https://www.instagram.com/n2autosandton/" target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-white hover:bg-primary hover:text-black transition-colors">
+                  <Instagram size={20} />
                 </a>
-                <a href="https://maps.google.com/maps?cid=11486238867110412855" target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-white hover:bg-primary hover:text-black transition-colors">
+                <a href="https://www.google.com/maps?q=-26.108786,28.077868" target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-white hover:bg-primary hover:text-black transition-colors">
                   <MapPin size={20} />
                 </a>
               </div>
@@ -168,15 +168,15 @@ export function Layout({ children }: { children: ReactNode }) {
               <ul className="space-y-4">
                 <li className="flex items-start gap-3 text-muted-foreground">
                   <MapPin className="text-primary mt-1 shrink-0" size={18} />
-                  <span>Johannesburg, South Africa</span>
+                  <a href="https://www.google.com/maps?q=-26.108786,28.077868" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Wynberg, Sandton, South Africa</a>
                 </li>
                 <li className="flex items-center gap-3 text-muted-foreground">
                   <Phone className="text-primary shrink-0" size={18} />
-                  <span>+27 (0) 11 000 0000</span>
+                  <span>087 892 0979</span>
                 </li>
                 <li className="flex items-center gap-3 text-muted-foreground">
                   <Mail className="text-primary shrink-0" size={18} />
-                  <span>info@autoassets.co.za</span>
+                  <span>info@n2autosandton.co.za</span>
                 </li>
               </ul>
             </div>
@@ -184,7 +184,7 @@ export function Layout({ children }: { children: ReactNode }) {
           
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} Auto Assets. All rights reserved.
+              &copy; {new Date().getFullYear()} N2 Auto Sandton. All rights reserved.
             </p>
             <p className="text-sm font-display tracking-widest text-primary font-semibold">
               ELEVATE YOUR DRIVE

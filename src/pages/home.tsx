@@ -7,21 +7,15 @@ import { Link } from "wouter";
 
 const REVIEWS = [
   {
-    name: "Lishan Naidoo",
-    date: "2026/03/11",
-    text: "Absolute class from JC and Nathan. Their integrity hones...",
+    name: "Rameez",
+    date: "AutoTrader Review",
+    text: "Top quality vehicles at great prices. Staff are super friendly and very helpful. 10/10 would definitely recommend!",
     rating: 5,
   },
   {
-    name: "Jessica De Jager",
-    date: "2026/02/02",
-    text: "Auto Assets really is the best dealership I have ever dealt...",
-    rating: 5,
-  },
-  {
-    name: "Canville Saaiman",
-    date: "2026/01/29",
-    text: "Good day guys. My experience with auto assets was tops...",
+    name: "Larry",
+    date: "AutoTrader Review",
+    text: "My sales experience was fantastic. Mohammed — a shining example of an experienced and tenacious salesman — went beyond expectations to create a wonderful sales experience. Simply fantastic and happy with my purchase!",
     rating: 5,
   },
 ];
@@ -39,8 +33,8 @@ export default function Home() {
       <section className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src={`${import.meta.env.BASE_URL}images/garage-hero.webp`}
-            alt="Premium Automotive"
+            src={`${import.meta.env.BASE_URL}images/garage-hero.png`}
+            alt="N2 Auto Sandton Showroom"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" />
@@ -166,12 +160,12 @@ export default function Home() {
 
           <div className="mt-12 text-center">
             <a
-              href="https://maps.google.com/maps?cid=11486238867110412855"
+              href="https://www.google.com/maps?q=-26.108786,28.077868"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-primary hover:text-white transition-colors"
             >
-              Read more on Google <ArrowRight size={16} />
+              Find us on Google Maps <ArrowRight size={16} />
             </a>
           </div>
         </div>

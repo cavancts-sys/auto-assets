@@ -1,6 +1,6 @@
 import { Layout } from "../components/layout";
 import { motion } from "framer-motion";
-import { MapPin, Phone, Mail, Clock, Send, Facebook } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Send, Instagram } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "../hooks/use-toast";
 import { useLocation } from "wouter";
@@ -26,7 +26,7 @@ export default function Contact() {
       setIsSubmitting(false);
       toast({
         title: "Message Sent Successfully",
-        description: "One of our premium sales agents will contact you shortly.",
+        description: "One of our sales agents will contact you shortly.",
         variant: "default",
       });
       (e.target as HTMLFormElement).reset();
@@ -57,7 +57,7 @@ export default function Contact() {
               Get in <span className="text-primary text-glow">Touch</span>
             </h1>
             <p className="text-lg text-muted-foreground font-light">
-              Experience unparalleled service. Contact Auto Assets today.
+              Experience unparalleled service. Contact N2 Auto Sandton today.
             </p>
           </motion.div>
         </div>
@@ -85,10 +85,10 @@ export default function Contact() {
                   <div>
                     <h3 className="text-lg font-bold text-white mb-2">Showroom Location</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Johannesburg<br />
+                      Wynberg, Sandton<br />
                       South Africa
                     </p>
-                    <a href="https://maps.google.com/maps?cid=11486238867110412855" target="_blank" rel="noopener noreferrer" className="inline-block mt-2 text-primary hover:text-white transition-colors text-sm uppercase tracking-wider font-semibold">
+                    <a href="https://www.google.com/maps?q=-26.108786,28.077868" target="_blank" rel="noopener noreferrer" className="inline-block mt-2 text-primary hover:text-white transition-colors text-sm uppercase tracking-wider font-semibold">
                       Get Directions
                     </a>
                   </div>
@@ -100,7 +100,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-white mb-2">Direct Line</h3>
-                    <p className="text-muted-foreground">Sales: +27 (0) 11 000 0000</p>
+                    <p className="text-muted-foreground">Sales (Mohamed): <a href="tel:0878920979" className="hover:text-primary transition-colors">087 892 0979</a></p>
                   </div>
                 </div>
 
@@ -110,7 +110,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-white mb-2">Email Address</h3>
-                    <p className="text-muted-foreground">info@autoassets.co.za</p>
+                    <a href="mailto:info@n2autosandton.co.za" className="text-muted-foreground hover:text-primary transition-colors">info@n2autosandton.co.za</a>
                   </div>
                 </div>
 
@@ -120,24 +120,38 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-white mb-2">Operating Hours</h3>
-                    <p className="text-muted-foreground">
-                      Monday - Friday: 08:00 - 17:00<br />
-                      Saturday: 09:00 - 13:00<br />
-                      Sunday: Closed
-                    </p>
+                    <div className="text-muted-foreground space-y-1">
+                      <p>Monday – Friday: <span className="text-white">08:00 – 17:00</span></p>
+                      <p>Saturdays: <span className="text-white">08:00 – 13:00</span></p>
+                      <p>Public Holidays: <span className="text-white">09:00 – 13:00</span></p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-12 pt-8 border-t border-border">
+              {/* Google Maps Embed */}
+              <div className="mt-10 rounded-xl overflow-hidden border border-border">
+                <iframe
+                  title="N2 Auto Sandton Location"
+                  src="https://maps.google.com/maps?q=-26.108786,28.077868&z=16&output=embed"
+                  width="100%"
+                  height="220"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+
+              <div className="mt-8 pt-8 border-t border-border">
                 <h3 className="text-lg font-bold text-white mb-4">Connect Socially</h3>
                 <a
-                  href="https://www.facebook.com/168652086330059"
+                  href="https://www.instagram.com/n2autosandton/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-6 py-3 bg-[#1877F2] text-white font-bold rounded hover:bg-[#0C63D4] transition-colors"
+                  className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white font-bold rounded hover:opacity-90 transition-opacity"
                 >
-                  <Facebook size={20} /> Follow on Facebook
+                  <Instagram size={20} /> Follow on Instagram
                 </a>
               </div>
             </motion.div>
